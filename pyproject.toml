@@ -1,0 +1,30 @@
+[project]
+name = "pganalyze-loki-shipper"
+version = "0.1.0"
+description = "Ships logs from loki to pganalyze collector via syslog"
+authors = [
+    { name = "Nickolaj Jepsen", email = "nij@ao.dk" }
+]
+dependencies = [
+    "websockets>=12.0",
+]
+readme = "README.md"
+requires-python = ">= 3.12"
+license = "MIT"
+
+[project.scripts]
+pganalyze-loki-shipper = "pganalyze_loki_shipper.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.rye]
+managed = true
+dev-dependencies = []
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pganalyze_loki_shipper"]
