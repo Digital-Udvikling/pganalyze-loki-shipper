@@ -11,6 +11,7 @@ LOKI_HOST = os.getenv("LOKI_HOST", None)
 LOKI_X_TOKEN = os.getenv("LOKI_TOKEN", None)
 LOKI_QUERY = os.getenv("LOKI_QUERY", None)
 
+logger = logging.getLogger(__name__)
 
 def parse_logs(logs: dict):
     result: list[tuple[int, str]] = []
@@ -32,11 +33,13 @@ def stream_logs():
                 url,
                 additional_headers={"X-Token": LOKI_X_TOKEN, "X-Datasource": "product"},
             ) as websocket:
+                logger.info(f"Connected to {url}")
                 for message in websocket:
                     parsed_message = json.loads(message)
                     yield from parse_logs(parsed_message)
         except Exception as e:
-            print(f"Error: {e}")
+            logger.error(f"Error: {e}")
+            logger.exception(e)
             continue
 
 
@@ -45,13 +48,17 @@ def run_syslog(host: str, port: int):
     syslogger.addHandler(
         SysLogHandler(address=(host, port), socktype=socket.SOCK_STREAM)
     )
+    log_count = 0
     for log_message in stream_logs():
         syslogger.info(log_message)
+        log_count += 1
+        if log_count % 1000 == 0:
+            logger.info(f"Sent {log_count} logs to syslog")
 
 
 def run_stdout():
     for log_message in stream_logs():
-        print(log_message)
+        logger.info(log_message)
 
 
 def main():
@@ -66,7 +73,9 @@ def main():
 
     pganalyze_syslog = os.getenv("PGANALYZE_SYSLOG", None)
     if pganalyze_syslog:
+        logger.info(f"Sending logs to syslog: {pganalyze_syslog}")
         host, port = pganalyze_syslog.split(":")
         run_syslog(host, int(port))
     else:
+        logger.info("Sending logs to stdout")
         run_stdout()
