@@ -10,5 +10,6 @@
 #   universal: false
 
 -e file:.
+ruff==0.5.7
 websockets==12.0
     # via pganalyze-loki-shipper

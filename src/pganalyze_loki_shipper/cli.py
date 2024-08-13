@@ -14,6 +14,7 @@ LOKI_QUERY = os.getenv("LOKI_QUERY", None)
 logger = logging.getLogger(__name__)
 logger.setLevel(os.getenv("LOG_LEVEL", logging.INFO))
 
+
 def parse_logs(logs: dict):
     result: list[tuple[int, str]] = []
     for log in logs["streams"]:
