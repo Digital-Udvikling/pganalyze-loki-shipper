@@ -13,6 +13,7 @@ LOKI_QUERY = os.getenv("LOKI_QUERY", None)
 
 logger = logging.getLogger(__name__)
 logger.setLevel(os.getenv("LOG_LEVEL", logging.INFO))
+logger.addHandler(logging.StreamHandler())
 
 
 def parse_logs(logs: dict):
